@@ -3,6 +3,9 @@ from app.services.CvAnalyzerService import CvAnalyzerService
 from app.tools.file_handler import FileHandler
 from app.llm.factory import get_llm
 import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CvController:
     async def analyze(self, file: UploadFile, job_position_id: int, user_id: str):
@@ -27,4 +30,5 @@ class CvController:
             return {"status": "success", "data": result}
             
         except Exception as e:
+            logger.error(f"CV Analysis Failed: {str(e)}", exc_info=True)
             raise HTTPException(status_code=500, detail=str(e))

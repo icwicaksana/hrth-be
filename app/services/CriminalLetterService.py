@@ -1,6 +1,7 @@
 import os
 import uuid
 import datetime
+import tempfile
 from docx import Document
 from typing import Dict, Any, List
 from config.supabase import supabase_client
@@ -154,7 +155,9 @@ class CriminalLetterService:
                     for paragraph in cell.paragraphs:
                         self._replace_text_in_paragraph(paragraph, replacements)
                         
-        filename = f"/tmp/{uuid.uuid4()}.docx"
+        # Save - using cross-platform temp directory
+        temp_dir = tempfile.gettempdir()
+        filename = os.path.join(temp_dir, f"{uuid.uuid4()}.docx")
         doc.save(filename)
         return filename
 

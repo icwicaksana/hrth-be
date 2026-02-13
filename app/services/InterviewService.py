@@ -2,6 +2,7 @@ import os
 import uuid
 import shutil
 import math
+import tempfile
 from typing import Dict, Any, List
 from config.supabase import supabase_client
 from app.tools.file_handler import FileHandler
@@ -58,13 +59,15 @@ class InterviewService(BaseAgent):
         self.groq_client = get_groq()
 
     async def __call__(self, user_id: str, file_path: str) -> Dict[str, Any]:
-        temp_dir = f"/tmp/interview_{uuid.uuid4()}"
+        # Create cross-platform temp directory
+        temp_base = tempfile.gettempdir()
+        temp_dir = os.path.join(temp_base, f"interview_{uuid.uuid4()}")
         os.makedirs(temp_dir, exist_ok=True)
         
-        # Define paths
+        # Define paths using os.path.join for cross-platform compatibility
         original_filename = os.path.basename(file_path)
-        local_original_path = f"{temp_dir}/{original_filename}"
-        local_audio_path = f"{temp_dir}/processed_audio.flac"
+        local_original_path = os.path.join(temp_dir, original_filename)
+        local_audio_path = os.path.join(temp_dir, "processed_audio.flac")
         
         try:
             # 1. Download File from Supabase
@@ -164,7 +167,7 @@ class InterviewService(BaseAgent):
         
         transcript_parts = []
         for i, chunk in enumerate(chunks):
-            chunk_path = f"{temp_dir}/chunk_{i}.flac"
+            chunk_path = os.path.join(temp_dir, f"chunk_{i}.flac")
             chunk.export(chunk_path, format="flac")
             
             # Double check chunk size (rarely > 25MB for 10mins flac mono 16khz, but good safety)
