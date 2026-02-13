@@ -10,6 +10,6 @@ def setup_middleware(app):
         allow_origins=origins, 
         allow_credentials=True, 
         allow_headers=["*"],
-        allow_methods=["GET", "POST", "OPTIONS", "DELETE"],
+        allow_methods=["*"],
         max_age=600,
     )
